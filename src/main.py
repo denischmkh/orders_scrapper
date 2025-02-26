@@ -89,7 +89,7 @@ async def type_message(event):
 
 
 async def waiting_order():
-    await client.start(PHONE_NUMBER)
+    await client.start(PHONE_NUMBER, password='denis2004000')
     await client2.start(PHONE_NUMBER_2)
     logging.info("Бот запущен и работает...")
     await asyncio.gather(
