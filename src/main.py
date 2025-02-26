@@ -14,7 +14,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from telethon.errors import FloodError
 from telethon import TelegramClient, events
 
-from config import API_TOKEN, API_HASH, TARGET_CHAT_ID, API_ID, PHONE_NUMBER, USER_CHAT_ID, API_ID_2, API_HASH_2, PHONE_NUMBER_2
+from config import API_TOKEN, API_HASH, TARGET_CHAT_ID, API_ID, PHONE_NUMBER, USER_CHAT_ID, API_ID_2, API_HASH_2, PHONE_NUMBER_2, MAIN_2FA, PARTNER_2FA
 
 logging.basicConfig(level=logging.INFO)
 
@@ -54,7 +54,7 @@ async def handler2(event):
     global fishing_active
     global with_partner_fishing
     if fishing_active and with_partner_fishing:
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(1)
         message = event.message
         # Проверка, если в тексте сообщения содержится "Нужны грузчики"
         if "Нужны грузчики" in message.text:
@@ -89,8 +89,8 @@ async def type_message(event):
 
 
 async def waiting_order():
-    await client.start(PHONE_NUMBER)
-    await client2.start(PHONE_NUMBER_2)
+    await client.start(PHONE_NUMBER, password=MAIN_2FA)
+    await client2.start(PHONE_NUMBER_2, password=PARTNER_2FA)
     logging.info("Бот запущен и работает...")
     await asyncio.gather(
         client.run_until_disconnected(),
