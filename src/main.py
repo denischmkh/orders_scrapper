@@ -14,7 +14,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from telethon.errors import FloodError
 from telethon import TelegramClient, events
 
-from config import API_TOKEN, API_HASH, TARGET_CHAT_ID, API_ID, PHONE_NUMBER, USER_CHAT_ID
+from config import API_TOKEN, API_HASH, TARGET_CHAT_ID, API_ID, PHONE_NUMBER, USER_CHAT_ID, API_ID_2, API_HASH_2, PHONE_NUMBER_2
+
+logging.basicConfig(level=logging.INFO)
 
 bot = Bot(API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML.value))
 
@@ -22,9 +24,12 @@ dp = Dispatcher()
 
 client = TelegramClient('session_name', API_ID, API_HASH)
 
+client2 = TelegramClient('session_name_2', API_ID_2, API_HASH_2)
+
 sender = False
 
 fishing_active = True
+with_partner_fishing = True
 
 menu_msg: types.Message | None = None
 
@@ -41,7 +46,24 @@ async def handler(event):
             global sender
             sender = True
     else:
-        await asyncio.sleep(0.1)
+        return
+
+
+@client2.on(events.NewMessage(chats=[TARGET_CHAT_ID, -1002351516242]))
+async def handler2(event):
+    global fishing_active
+    global with_partner_fishing
+    if fishing_active and with_partner_fishing:
+        await asyncio.sleep(1.5)
+        message = event.message
+        # Проверка, если в тексте сообщения содержится "Нужны грузчики"
+        if "Нужны грузчики" in message.text:
+            # Отправляем ответ на сообщение
+            await message.reply("+")
+            global sender
+            sender = True
+    else:
+        return
 
 
 @client.on(events.NewMessage(pattern=r"\.type ", from_users="me"))
@@ -65,23 +87,15 @@ async def type_message(event):
             await asyncio.sleep(3)
 
 
-@client.on(events.NewMessage(pattern=r"\.load ", from_users="me"))
-async def load_message(event):
-    orig_text = event.text.split(".load ", maxsplit=1)[1]
-    text = orig_text
-    procent = random.randint(0, 101)
-    load_string = "[---------------------------------------------------------------------------------------------------] 0%"
-    await event.edit(text + '\n' + load_string)
-    for l in range(0, procent // 2):
-        load_string = '[' + ('#' * l) + ('--' * (50 - l)) + ']' + f" {str(l * 2)}%"
-        await event.edit(text + '\n' + load_string)
-        await asyncio.sleep(0.1)
-
 
 async def waiting_order():
     await client.start(PHONE_NUMBER)
+    await client2.start(PHONE_NUMBER_2)
     logging.info("Бот запущен и работает...")
-    await client.run_until_disconnected()
+    await asyncio.gather(
+        client.run_until_disconnected(),
+        client2.run_until_disconnected()
+    )
 
 
 @dp.callback_query(F.data == 'stop_notification')
@@ -115,6 +129,23 @@ async def stop_fishing(callback: types.CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=make_stop_fishing_markup())
     logging.info('Fishing stopped...')
 
+@dp.callback_query(F.data == 'with_partner')
+async def remove_partner(callback: types.CallbackQuery):
+    global with_partner_fishing
+    if not with_partner_fishing:
+        await callback.answer('❗️ Вы итак без партнера ❗️')
+        return
+    with_partner_fishing = False
+    await callback.message.edit_reply_markup(reply_markup=make_without_partner_markup())
+
+@dp.callback_query(F.data == 'without_partner')
+async def remove_partner(callback: types.CallbackQuery):
+    global with_partner_fishing
+    if with_partner_fishing:
+        await callback.answer('❗️ Вы итак с партнером ❗️')
+        return
+    with_partner_fishing = True
+    await callback.message.edit_reply_markup(reply_markup=make_startup_markup())
 
 async def delete_notification_later(message_id: int) -> None:
     await asyncio.sleep(15)
@@ -136,15 +167,28 @@ async def send_message():
 
 
 def make_startup_markup() -> InlineKeyboardMarkup:
+    global with_partner_fishing
+    partner_button = [InlineKeyboardButton(text='С Ильей 🐴 ✅', callback_data='with_partner')] if with_partner_fishing else [InlineKeyboardButton(text='Без Ильи 🐴 ❌', callback_data='without_partner')]
     markup = InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text='Включить ✅', callback_data='start'),
              InlineKeyboardButton(text='Выключить ◼️', callback_data='stop')],
+            partner_button,
             [InlineKeyboardButton(text='Остановить уведомления 📲❌', callback_data='stop_notification')]
         ]
     )
     return markup
 
+def make_without_partner_markup() -> InlineKeyboardMarkup:
+    markup = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='Включить ✅', callback_data='start'),
+             InlineKeyboardButton(text='Выключить ◼️', callback_data='stop')],
+            [InlineKeyboardButton(text='Без Ильи 🐴 ❌', callback_data='without_partner')],
+            [InlineKeyboardButton(text='Остановить уведомления 📲❌', callback_data='stop_notification')]
+        ]
+    )
+    return markup
 
 def make_stop_fishing_markup() -> InlineKeyboardMarkup:
     markup = InlineKeyboardMarkup(
