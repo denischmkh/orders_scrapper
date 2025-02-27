@@ -51,7 +51,7 @@ async def handler(event):
             kyiv_tz = pytz.timezone('Europe/Kiev')
             time_now = datetime.datetime.now(kyiv_tz)
             minutes = time_now.minute
-            rounded_minutes = 5 * round(minutes / 5)
+            rounded_minutes = 5 * round(minutes / 5) + 20
             if rounded_minutes == 60:
                 time_now += datetime.timedelta(hours=1)
                 rounded_minutes = 0
@@ -79,7 +79,7 @@ async def handler2(event):
             kyiv_tz = pytz.timezone('Europe/Kiev')
             time_now = datetime.datetime.now(kyiv_tz)
             minutes = time_now.minute
-            rounded_minutes = 5 * round(minutes / 5)
+            rounded_minutes = 5 * round(minutes / 5) + 20
             if rounded_minutes == 60:
                 time_now += datetime.timedelta(hours=1)
                 rounded_minutes = 0
