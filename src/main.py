@@ -5,6 +5,7 @@ import os.path
 import random
 import sys
 
+import pytz
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -40,11 +41,17 @@ async def handler(event):
     if fishing_active:
         message = event.message
         # Проверка, если в тексте сообщения содержится "Нужны грузчики"
-        if "Нужны грузчики" in message.text:
+        if "нужны грузчики" in message.text.lower() and 'кто первый поставит “+“' in message.text.lower():
             # Отправляем ответ на сообщение
             await message.reply("+")
             global sender
             sender = True
+        elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
+            kyiv_tz = pytz.timezone('Europe/Kiev')
+            time_now = datetime.datetime.now(kyiv_tz)
+            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - int(str(time_now.minute)[1]))))
+            time_str = time_in_20_minutes.strftime('%H:%M')
+            await message.reply(f"{time_str}")
     else:
         return
 
@@ -57,11 +64,17 @@ async def handler2(event):
         await asyncio.sleep(1)
         message = event.message
         # Проверка, если в тексте сообщения содержится "Нужны грузчики"
-        if "Нужны грузчики" in message.text:
+        if "нужны грузчики" in message.text.lower() and 'кто первый поставит “+“' in message.text.lower():
             # Отправляем ответ на сообщение
             await message.reply("+")
             global sender
             sender = True
+        elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
+            kyiv_tz = pytz.timezone('Europe/Kiev')
+            time_now = datetime.datetime.now(kyiv_tz)
+            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - int(str(time_now.minute)[1]))))
+            time_str = time_in_20_minutes.strftime('%H:%M')
+            await message.reply(f"{time_str}")
     else:
         return
 
