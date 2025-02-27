@@ -90,7 +90,7 @@ async def type_message(event):
 
 async def waiting_order():
     await client.start(PHONE_NUMBER, password=MAIN_2FA)
-    await client2.start(PHONE_NUMBER_2, password=PARTNER_2FA)
+    await client2.start(PHONE_NUMBER_2)
     logging.info("Бот запущен и работает...")
     await asyncio.gather(
         client.run_until_disconnected(),
