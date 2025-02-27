@@ -49,7 +49,7 @@ async def handler(event):
         elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
             kyiv_tz = pytz.timezone('Europe/Kiev')
             time_now = datetime.datetime.now(kyiv_tz)
-            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - (time_now.minute % 10))))
+            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (time_now.minute % 10)))
             time_str = time_in_20_minutes.strftime('%H:%M')
             await message.reply(f"{time_str}")
     else:
@@ -72,7 +72,7 @@ async def handler2(event):
         elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
             kyiv_tz = pytz.timezone('Europe/Kiev')
             time_now = datetime.datetime.now(kyiv_tz)
-            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - (time_now.minute % 10))))
+            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (time_now.minute % 10)))
             time_str = time_in_20_minutes.strftime('%H:%M')
             await message.reply(f"{time_str}")
     else:
