@@ -38,20 +38,27 @@ menu_msg: types.Message | None = None
 @client.on(events.NewMessage(chats=[TARGET_CHAT_ID, -1002351516242]))
 async def handler(event):
     global fishing_active
+    global sender
     if fishing_active:
         message = event.message
         # Проверка, если в тексте сообщения содержится "Нужны грузчики"
         if "нужны грузчики" in message.text.lower() and 'кто первый поставит “+“' in message.text.lower():
             # Отправляем ответ на сообщение
             await message.reply("+")
-            global sender
+
             sender = True
         elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
             kyiv_tz = pytz.timezone('Europe/Kiev')
             time_now = datetime.datetime.now(kyiv_tz)
-            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - time_now.minute % 10)))
-            time_str = time_in_20_minutes.strftime('%H:%M')
+            minutes = time_now.minute
+            rounded_minutes = 5 * round(minutes / 5)
+            if rounded_minutes == 60:
+                time_now += datetime.timedelta(hours=1)
+                rounded_minutes = 0
+            time_in_rounded = time_now.replace(minute=rounded_minutes, second=0, microsecond=0)
+            time_str = time_in_rounded.strftime('%H:%M')
             await message.reply(f"{time_str}")
+            sender = True
     else:
         return
 
@@ -60,21 +67,26 @@ async def handler(event):
 async def handler2(event):
     global fishing_active
     global with_partner_fishing
+    global sender
     if fishing_active and with_partner_fishing:
         await asyncio.sleep(1)
         message = event.message
-        # Проверка, если в тексте сообщения содержится "Нужны грузчики"
         if "нужны грузчики" in message.text.lower() and 'кто первый поставит “+“' in message.text.lower():
             # Отправляем ответ на сообщение
             await message.reply("+")
-            global sender
             sender = True
         elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
             kyiv_tz = pytz.timezone('Europe/Kiev')
             time_now = datetime.datetime.now(kyiv_tz)
-            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - time_now.minute % 10)))
-            time_str = time_in_20_minutes.strftime('%H:%M')
+            minutes = time_now.minute
+            rounded_minutes = 5 * round(minutes / 5)
+            if rounded_minutes == 60:
+                time_now += datetime.timedelta(hours=1)
+                rounded_minutes = 0
+            time_in_rounded = time_now.replace(minute=rounded_minutes, second=0, microsecond=0)
+            time_str = time_in_rounded.strftime('%H:%M')
             await message.reply(f"{time_str}")
+            sender = True
     else:
         return
 
