@@ -26,10 +26,12 @@ from config import (API_TOKEN,
                     PHONE_NUMBER_2,
                     MAIN_2FA,
                     PARTNER_2FA,
+                    FIRST_PARTNER_NAME,
                     API_ID_3,
                     API_HASH_3,
                     PHONE_NUMBER_3,
-                    PARTNER_2_2FA)
+                    PARTNER_2_2FA,
+                    SECOND_PARTNER_NAME)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -250,12 +252,12 @@ async def send_message():
 def check_user_is_working(user_status, user: int = 1 | 2) -> InlineKeyboardButton | None:
     match user_status:
         case True:
-            return InlineKeyboardButton(text='Илья ✅',callback_data='with_partner') if user == 1\
-                else InlineKeyboardButton(text='Влад ✅',
+            return InlineKeyboardButton(text=f'{FIRST_PARTNER_NAME} ✅',callback_data='with_partner') if user == 1\
+                else InlineKeyboardButton(text=f'{SECOND_PARTNER_NAME} ✅',
                                                      callback_data='with_second_partner')
         case False:
-            return InlineKeyboardButton(text='Илья ◼️', callback_data='without_partner') if user == 1\
-                else InlineKeyboardButton(text='Влад ◼️', callback_data='without_second_partner')
+            return InlineKeyboardButton(text=f'{FIRST_PARTNER_NAME} ◼️', callback_data='without_partner') if user == 1\
+                else InlineKeyboardButton(text=f'{SECOND_PARTNER_NAME} ◼️', callback_data='without_second_partner')
         case None:
             return None
 

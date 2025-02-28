@@ -16,8 +16,10 @@ API_ID_2 = int(os.getenv('API_ID_2') or 0) if os.getenv("API_ID_2") else None
 API_HASH_2 = os.getenv('API_HASH_2') or None
 PHONE_NUMBER_2 = os.getenv('PHONE_NUMBER_2') or None
 PARTNER_2FA = os.getenv('PARTNER_2FA') or None
+FIRST_PARTNER_NAME = os.getenv('FIRST_PARTNER_NAME') or None
 
 API_ID_3 = int(os.getenv("API_ID_3") or 0) if os.getenv("API_ID_3") else None
 API_HASH_3 = os.getenv("API_HASH_3") or None
 PHONE_NUMBER_3 = os.getenv("PHONE_NUMBER_3") or None
 PARTNER_2_2FA = os.getenv("PARTNER_2_2FA") or None
+SECOND_PARTNER_NAME = os.getenv("SECOND_PARTNER_NAME") or None
