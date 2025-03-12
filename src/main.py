@@ -20,18 +20,13 @@ from config import (API_TOKEN,
                     TARGET_CHAT_ID,
                     API_ID,
                     PHONE_NUMBER,
-                    USER_CHAT_ID,
+                    ADMIN_CHAT_ID,
                     API_ID_2,
                     API_HASH_2,
                     PHONE_NUMBER_2,
                     MAIN_2FA,
                     PARTNER_2FA,
-                    FIRST_PARTNER_NAME,
-                    API_ID_3,
-                    API_HASH_3,
-                    PHONE_NUMBER_3,
-                    PARTNER_2_2FA,
-                    SECOND_PARTNER_NAME)
+                    FIRST_PARTNER_NAME)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -43,7 +38,6 @@ client = TelegramClient('session_name', API_ID, API_HASH)
 
 client2 = TelegramClient('session_name_2', API_ID_2, API_HASH_2)
 
-client3 = TelegramClient('session_name_3', API_ID, API_HASH)
 
 sender = False
 
@@ -51,7 +45,6 @@ fishing_active = True
 
 second_partner = True if API_ID_2 else None
 
-third_partner = True if API_ID_3 else None
 
 menu_msg: types.Message | None = None
 
@@ -101,28 +94,6 @@ async def handler2(event):
     else:
         return
 
-@client3.on(events.NewMessage(chats=[TARGET_CHAT_ID, -1002351516242]))
-async def handler2(event):
-    global fishing_active
-    global third_partner
-    global sender
-    if fishing_active and third_partner:
-        await asyncio.sleep(1)
-        message = event.message
-        # Проверка, если в тексте сообщения содержится "Нужны грузчики"
-        if "нужны грузчики" in message.text.lower() and 'кто первый поставит “+“' in message.text.lower():
-            # Отправляем ответ на сообщение
-            await message.reply("+")
-            sender = True
-        elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
-            kyiv_tz = pytz.timezone('Europe/Kiev')
-            time_now = datetime.datetime.now(kyiv_tz)
-            time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - time_now.minute % 10)))
-            time_str = time_in_20_minutes.strftime('%H:%M')
-            await message.reply(f"{time_str}")
-            sender = True
-    else:
-        return
 
 
 @client.on(events.NewMessage(pattern=r"\.type ", from_users="me"))
@@ -146,16 +117,7 @@ async def type_message(event):
             await asyncio.sleep(3)
 
 
-async def waiting_order():
-    await client.start(PHONE_NUMBER, password=MAIN_2FA)
-    await client2.start(PHONE_NUMBER_2)
-    await client3.start(PHONE_NUMBER, password=MAIN_2FA)
-    logging.info("Бот запущен и работает...")
-    await asyncio.gather(
-        client.run_until_disconnected(),
-        client2.run_until_disconnected(),
-        client3.run_until_disconnected()
-    )
+
 
 
 @dp.callback_query(F.data == 'stop_notification')
@@ -232,7 +194,7 @@ async def remove_partner(callback: types.CallbackQuery):
 
 async def delete_notification_later(message_id: int) -> None:
     await asyncio.sleep(15)
-    await bot.delete_message(USER_CHAT_ID, message_id=message_id)
+    await bot.delete_message(ADMIN_CHAT_ID, message_id=message_id)
 
 
 async def send_message():
@@ -240,7 +202,7 @@ async def send_message():
     now_time = datetime.datetime.now()
     while True:
         if sender:
-            msg = await bot.send_message(chat_id=USER_CHAT_ID,
+            msg = await bot.send_message(chat_id=ADMIN_CHAT_ID,
                                          text=f'🕒 <b>Новый заказ!\n\n📅Время: {now_time.hour}:{now_time.minute}:{now_time.second}</b>')
             asyncio.create_task(delete_notification_later(msg.message_id))
             await asyncio.sleep(5)
@@ -249,15 +211,12 @@ async def send_message():
             await asyncio.sleep(1)
 
 
-def check_user_is_working(user_status, user: int = 1 | 2) -> InlineKeyboardButton | None:
+def check_user_is_working(user_status) -> InlineKeyboardButton | None:
     match user_status:
         case True:
-            return InlineKeyboardButton(text=f'{FIRST_PARTNER_NAME} ✅',callback_data='with_partner') if user == 1\
-                else InlineKeyboardButton(text=f'{SECOND_PARTNER_NAME} ✅',
-                                                     callback_data='with_second_partner')
+            return InlineKeyboardButton(text=f'{FIRST_PARTNER_NAME} ✅',callback_data='with_partner')
         case False:
-            return InlineKeyboardButton(text=f'{FIRST_PARTNER_NAME} ◼️', callback_data='without_partner') if user == 1\
-                else InlineKeyboardButton(text=f'{SECOND_PARTNER_NAME} ◼️', callback_data='without_second_partner')
+            return InlineKeyboardButton(text=f'{FIRST_PARTNER_NAME} ◼️', callback_data='without_partner')
         case None:
             return None
 
@@ -265,7 +224,6 @@ def check_user_is_working(user_status, user: int = 1 | 2) -> InlineKeyboardButto
 def make_markup() -> InlineKeyboardMarkup:
     global fishing_active
     global second_partner
-    global third_partner
     if not fishing_active:
         markup = InlineKeyboardMarkup(
             inline_keyboard=[
@@ -276,13 +234,12 @@ def make_markup() -> InlineKeyboardMarkup:
         )
         return markup
     else:
-        partner_button = check_user_is_working(second_partner, 1)
-        second_partner_button = check_user_is_working(third_partner, 2)
+        partner_button = check_user_is_working(second_partner)
         markup = InlineKeyboardMarkup(
             inline_keyboard=[
                 [InlineKeyboardButton(text='Включить ✅', callback_data='start'),
                  InlineKeyboardButton(text='Выключить ◼️', callback_data='stop')],
-                [partner_button if partner_button else InlineKeyboardButton(text='Не активен❌', callback_data='none'), second_partner_button if second_partner_button else InlineKeyboardButton(text='Не активен❌', callback_data='none')],
+                [partner_button if partner_button else InlineKeyboardButton(text='Не активен❌', callback_data='none')],
                 [InlineKeyboardButton(text='Остановить уведомления 📲❌', callback_data='stop_notification')]
             ]
         )
@@ -292,18 +249,34 @@ def make_markup() -> InlineKeyboardMarkup:
 
 async def send_menu_to_user():
     global menu_msg
-    msg = await bot.send_photo(USER_CHAT_ID,
+    msg = await bot.send_photo(ADMIN_CHAT_ID,
                                photo=URLInputFile(
                                    url='https://i.pinimg.com/550x/8e/67/24/8e672428f6fc29cc1bdfd6f9e45d30d4.jpg',
                                    filename='menu_image.png'),
-                               caption='<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>',
+                               caption='<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n'
+                                       '1.Кнопка "Выключить" представьте себе <b>❗️❗️❗️ВЫКЛЮЧАЕТ БОТА❗️❗️❗️</b>\n'
+                                       '2.Кнопка "Остановить уведомления " Угадай ЧЕ? <b>❗️❗️❗️ВЫКЛЮЧАЕТ УВЕДОМЛЕНИЯ❗️❗️❗️</b>',
                                reply_markup=make_markup())
     menu_msg = msg
 
+async def waiting_order():
+    try:
+        await client.start(PHONE_NUMBER, password=MAIN_2FA)
+        await client2.start(PHONE_NUMBER_2, password=PARTNER_2FA)
+    except (TypeError, ValueError):
+        pass
+    logging.info("Бот запущен и работает...")
+    try:
+        await asyncio.gather(
+            client.run_until_disconnected(),
+            client2.run_until_disconnected()
+        )
+    except ConnectionError:
+        pass
 
 async def on_shutdown():
     global menu_msg
-    await bot.delete_message(USER_CHAT_ID, message_id=menu_msg.message_id)
+    await bot.delete_message(ADMIN_CHAT_ID, message_id=menu_msg.message_id)
 
 
 async def on_startup():

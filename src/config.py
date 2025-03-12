@@ -8,7 +8,7 @@ API_ID = int(os.getenv('API_ID'))
 API_HASH = os.getenv('API_HASH')
 PHONE_NUMBER = os.getenv('PHONE_NUMBER')
 API_TOKEN = os.getenv('API_TOKEN')
-USER_CHAT_ID = int(os.getenv('USER_CHAT_ID'))
+ADMIN_CHAT_ID = int(os.getenv('ADMIN_CHAT_ID'))
 TARGET_CHAT_ID = int(os.getenv('TARGET_CHAT_ID'))
 MAIN_2FA = os.getenv('MAIN_2FA')
 
@@ -18,8 +18,3 @@ PHONE_NUMBER_2 = os.getenv('PHONE_NUMBER_2') or None
 PARTNER_2FA = os.getenv('PARTNER_2FA') or None
 FIRST_PARTNER_NAME = os.getenv('FIRST_PARTNER_NAME') or None
 
-API_ID_3 = int(os.getenv("API_ID_3") or 0) if os.getenv("API_ID_3") else None
-API_HASH_3 = os.getenv("API_HASH_3") or None
-PHONE_NUMBER_3 = os.getenv("PHONE_NUMBER_3") or None
-PARTNER_2_2FA = os.getenv("PARTNER_2_2FA") or None
-SECOND_PARTNER_NAME = os.getenv("SECOND_PARTNER_NAME") or None
