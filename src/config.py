@@ -4,17 +4,21 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_ID = int(os.getenv('API_ID'))
-API_HASH = os.getenv('API_HASH')
-PHONE_NUMBER = os.getenv('PHONE_NUMBER')
-API_TOKEN = os.getenv('API_TOKEN')
-ADMIN_CHAT_ID = int(os.getenv('ADMIN_CHAT_ID'))
+API_1_ID = int(os.getenv('API_1_ID')) or None
+API_1_HASH = os.getenv('API_1_HASH') or None
+PHONE_1_NUMBER = os.getenv('PHONE_1_NUMBER') or None
+USER_1_2FA = os.getenv('USER_1_2FA') or None
+USER_1_CHAT_ID = os.getenv('USER_1_CHAT_ID') or None
+USER_1_NAME = os.getenv('USER_1_NAME')
+
+
+API_2_ID = int(os.getenv('API_2_ID')) or None
+API_2_HASH = os.getenv('API_2_HASH') or None
+PHONE_2_NUMBER = os.getenv('PHONE_2_NUMBER') or None
+USER_2_2FA = os.getenv('USER_2_2FA') or None
+USER_2_CHAT_ID = os.getenv('USER_2_CHAT_ID') or None
+USER_2_NAME = os.getenv('USER_2_NAME')
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+
 TARGET_CHAT_ID = int(os.getenv('TARGET_CHAT_ID'))
-MAIN_2FA = os.getenv('MAIN_2FA')
-
-API_ID_2 = int(os.getenv('API_ID_2') or 0) if os.getenv("API_ID_2") else None
-API_HASH_2 = os.getenv('API_HASH_2') or None
-PHONE_NUMBER_2 = os.getenv('PHONE_NUMBER_2') or None
-PARTNER_2FA = os.getenv('PARTNER_2FA') or None
-FIRST_PARTNER_NAME = os.getenv('FIRST_PARTNER_NAME') or None
-
