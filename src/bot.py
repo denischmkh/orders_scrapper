@@ -21,10 +21,11 @@ dp = Dispatcher()
 
 async def on_startup():
     for worker in workers.values():
+        user_is_working_msg = '<b>Вы не работаете❌</b>' if not worker.working else '<b>Вы работаете✅</b>'
         menu_msg = await bot.send_photo(worker.user_chat_id,
                              photo=URLInputFile(
                                  url='https://i.pinimg.com/550x/8e/67/24/8e672428f6fc29cc1bdfd6f9e45d30d4.jpg'),
-                             caption='<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n',
+                             caption=f'<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n{user_is_working_msg}',
                              reply_markup=make_markup(working=worker.working))
         worker.menu_msg = menu_msg.message_id
 
@@ -66,7 +67,7 @@ async def start_working(callback: CallbackQuery):
 async def stop_notification(callback: CallbackQuery):
     worker = workers.get(callback.from_user.id)
     worker.sender = False
-    await callback.answer('Уведомления остановлены')
+    await callback.answer('❗️❗️Уведомления остановлены❗️❗️')
 
 
 async def run_bot_client():
