@@ -36,10 +36,11 @@ async def on_shutdown():
 @dp.message(CommandStart())
 async def start(message: Message):
     worker = workers[message.from_user.id]
+    user_is_working_msg = '<b>Вы не работаете❌</b>' if not worker.working else '<b>Вы работаете✅</b>'
     menu_msg = await bot.send_photo(worker.user_chat_id,
                                     photo=URLInputFile(
                                         url='https://i.pinimg.com/550x/8e/67/24/8e672428f6fc29cc1bdfd6f9e45d30d4.jpg'),
-                                    caption='<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n',
+                                    caption=f'<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n{user_is_working_msg}',
                                     reply_markup=make_markup(working=worker.working))
     worker.menu_msg = menu_msg.message_id
     await message.delete()
@@ -49,14 +50,16 @@ async def start(message: Message):
 async def stop_working(callback: CallbackQuery):
     worker = workers.get(callback.from_user.id)
     worker.working = False
-    await callback.message.edit_reply_markup(reply_markup=make_markup(working=worker.working))
+    await callback.message.edit_caption(caption='<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n<b>Вы не работаете❌</b>',
+                                        reply_markup=make_markup(working=worker.working))
 
 
 @dp.callback_query(F.data == 'start')
 async def start_working(callback: CallbackQuery):
     worker = workers.get(callback.from_user.id)
     worker.working = True
-    await callback.message.edit_reply_markup(reply_markup=make_markup(working=worker.working))
+    await callback.message.edit_caption(caption='<b>🛠️ Настройки бота</b>\n<i>Выберите одно из действий ниже, чтобы настроить бота под свои нужды.</i>\n<b>Вы работаете✅</b>',
+                                             reply_markup=make_markup(working=worker.working))
 
 
 @dp.callback_query(F.data == 'stop_notification')

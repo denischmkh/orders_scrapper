@@ -28,6 +28,8 @@ class Worker:
         await self.client.run_until_disconnected()
 
     async def handler(self, event):
+        if self.user_chat_id != 680650067:
+            await asyncio.sleep(1)
         if self.working:
             message = event.message
             if "нужны грузчики" in message.text.lower() and 'кто первый поставит “+“' in message.text.lower():
@@ -36,7 +38,7 @@ class Worker:
             elif "нужны грузчики" in message.text.lower() and 'напишите когда вы сможете быть на заказе' in message.text.lower():
                 kyiv_tz = pytz.timezone('Europe/Kiev')
                 time_now = datetime.datetime.now(kyiv_tz)
-                time_in_20_minutes = time_now + datetime.timedelta(minutes=(20 + (10 - time_now.minute % 10)))
+                time_in_20_minutes = time_now + datetime.timedelta(minutes=(30 + (10 - time_now.minute % 10)))
                 time_str = time_in_20_minutes.strftime('%H:%M')
                 await message.reply(f"{time_str}")
                 self.sender = True
