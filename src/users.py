@@ -44,7 +44,7 @@ class Worker:
                 self.sender = True
 
 
-denis = Worker(api_id=API_1_ID,
+worker1 = Worker(api_id=API_1_ID,
                api_hash=API_1_HASH,
                phone_number=PHONE_1_NUMBER,
                user_2fa=USER_1_2FA,
@@ -52,7 +52,7 @@ denis = Worker(api_id=API_1_ID,
                user_name=USER_1_NAME
                )
 
-iliya = Worker(api_id=API_2_ID,
+worker2 = Worker(api_id=API_2_ID,
                api_hash=API_2_HASH,
                phone_number=PHONE_2_NUMBER,
                user_2fa=USER_2_2FA,
@@ -60,9 +60,11 @@ iliya = Worker(api_id=API_2_ID,
                user_name=USER_2_NAME
                )
 
+WORKERS_LIST = [worker1, worker2]
+
+
 workers = {
-    denis.user_chat_id: denis,
-    iliya.user_chat_id: iliya,
+    worker.user_chat_id: worker for worker in WORKERS_LIST
 }
 
 
